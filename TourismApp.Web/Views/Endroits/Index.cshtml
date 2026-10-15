@@ -1,0 +1,94 @@
+@model IEnumerable<TourismApp.Web.Models.Endroit>
+@{
+    ViewData["Title"] = "Site de Tourisme";
+}
+
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-bold mb-1" style="color: #0f172a;">Site de Tourisme</h4>
+            <p class="text-muted small mb-0">Bienvenue sur le panneau de gestion centralisé des sites et monuments</p>
+        </div>
+        <a asp-action="Create" class="btn btn-algo-primary d-inline-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg"></i>
+            <span>Ajouter</span>
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-geo-alt fs-1 d-block mb-2"></i>
+            <p>Aucun site touristique trouvé.</p>
+            <a asp-action="Create" class="btn btn-sm btn-outline-primary">Ajouter un premier site</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-custom align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">#</th>
+                        <th>Nom</th>
+                        <th>Type</th>
+                        <th style="width: 200px;" class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int index = 1;
+                    }
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="text-muted fw-semibold">@index</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" alt="@item.Nom" class="rounded" style="width: 48px; height: 38px; object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                        <div class="rounded bg-light d-flex align-items-center justify-content-center text-secondary" style="width: 48px; height: 38px;">
+                                            <i class="bi bi-image"></i>
+                                        </div>
+                                    }
+                                    <div>
+                                        <div class="fw-semibold text-dark">@item.Nom</div>
+                                        <small class="text-muted">
+                                            <i class="bi bi-geo-alt"></i> Lat: @item.Latitude.ToString("F4"), Lng: @item.Longitude.ToString("F4")
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border px-3 py-2 fw-medium">
+                                    @item.TypeCategorie
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-inline-flex gap-2">
+                                    <!-- Bouton Voir (Figure 13) -->
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm" style="background-color: #0099cc; color: white; padding: 4px 14px; font-size: 0.85rem;">
+                                        voir
+                                    </a>
+
+                                    <!-- Bouton Supprimer (Figure 13) -->
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer « @item.Nom » ?');" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm" style="background-color: #0080aa; color: white; padding: 4px 12px; font-size: 0.85rem;">
+                                            Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        index++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

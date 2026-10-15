@@ -1,0 +1,92 @@
+@model TourismApp.Web.Models.Parcours
+@{
+    ViewData["Title"] = "Détail du parcours - " + Model.Nom;
+}
+
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-1">@Model.Nom</h4>
+            <div class="d-flex gap-3 text-muted small">
+                <span><i class="bi bi-clock me-1 text-primary"></i>Durée : <strong>@(Model.Duree ?? "Non spécifiée")</strong></span>
+                <span><i class="bi bi-geo me-1 text-success"></i>Distance : <strong>@(Model.Distance ?? "Non spécifiée")</strong></span>
+                <span><i class="bi bi-list-ol me-1 text-warning"></i>Étapes : <strong>@Model.Etapes.Count</strong></span>
+            </div>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Retour aux parcours
+        </a>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="border rounded-3 overflow-hidden shadow-sm">
+                <div id="parcoursMap" style="height: 420px; width: 100%;"></div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card border-0 bg-light p-3 rounded-3 h-100">
+                <h6 class="fw-bold text-dark mb-3">
+                    <i class="bi bi-signpost-split-fill text-primary me-2"></i>Étapes ordonnées de l'itinéraire
+                </h6>
+                <div class="list-group list-group-flush bg-transparent">
+                    @foreach (var etape in Model.Etapes)
+                    {
+                        <div class="list-group-item bg-transparent px-0 py-2 d-flex align-items-center gap-3">
+                            <span class="badge rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                @etape.Rang
+                            </span>
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold text-dark">@etape.Endroit.Nom</div>
+                                <small class="text-muted">@etape.Endroit.TypeCategorie</small>
+                            </div>
+                            <a asp-controller="Endroits" asp-action="Details" asp-route-id="@etape.EndroitId" class="btn btn-sm btn-link text-decoration-none">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <h6 class="fw-bold text-dark mb-2">Description du circuit</h6>
+        <p class="text-secondary leading-relaxed">
+            @Model.Description
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var etapes = [
+                @foreach (var etape in Model.Etapes)
+                {
+                    <text>{ rang: @etape.Rang, nom: "@etape.Endroit.Nom", lat: @etape.Endroit.Latitude, lng: @etape.Endroit.Longitude },</text>
+                }
+            ];
+
+            if (etapes.length > 0) {
+                var map = L.map('parcoursMap').setView([etapes[0].lat, etapes[0].lng], 14);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap'
+                }).addTo(map);
+
+                var latlngs = [];
+                etapes.forEach(function (e) {
+                    var point = [e.lat, e.lng];
+                    latlngs.push(point);
+                    L.marker(point).addTo(map).bindPopup('<strong>' + e.rang + '. ' + e.nom + '</strong>');
+                });
+
+                // Tracer la ligne de l'itinéraire
+                if (latlngs.length > 1) {
+                    var polyline = L.polyline(latlngs, { color: '#0099cc', weight: 4, opacity: 0.8, dashArray: '5, 10' }).addTo(map);
+                    map.fitBounds(polyline.getBounds().pad(0.1));
+                }
+            }
+        });
+    </script>
+}

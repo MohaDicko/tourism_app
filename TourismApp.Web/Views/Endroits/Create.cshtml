@@ -1,0 +1,153 @@
+@model TourismApp.Web.ViewModels.EndroitFormViewModel
+@{
+    ViewData["Title"] = "Ajouter un Site";
+}
+
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <h4 class="fw-bold mb-0 text-dark">Ajouter un Site</h4>
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Retour à la liste
+        </a>
+    </div>
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        <div class="row g-4">
+            <!-- Colonne gauche : Champs principaux (Figure 14) -->
+            <div class="col-lg-7">
+                <!-- Nom -->
+                <div class="mb-3">
+                    <label asp-for="Nom" class="form-label text-muted small fw-semibold">Nom</label>
+                    <input asp-for="Nom" class="form-control" placeholder="ex: Palais Bahia" required />
+                    <span asp-validation-for="Nom" class="text-danger small"></span>
+                </div>
+
+                <!-- Longitude & Latitude -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Longitude" class="form-label text-muted small fw-semibold">Longitude</label>
+                        <input asp-for="Longitude" class="form-control" id="inputLongitude" step="any" required />
+                        <span asp-validation-for="Longitude" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Latitude" class="form-label text-muted small fw-semibold">Latitude</label>
+                        <input asp-for="Latitude" class="form-control" id="inputLatitude" step="any" required />
+                        <span asp-validation-for="Latitude" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- GSM -->
+                <div class="mb-3">
+                    <label asp-for="Numero" class="form-label text-muted small fw-semibold">GSM</label>
+                    <input asp-for="Numero" class="form-control" placeholder="ex: +212 524 380000" />
+                    <span asp-validation-for="Numero" class="text-danger small"></span>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label text-muted small fw-semibold">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="4" placeholder="Histoire, anecdotes et description du site..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <!-- Statut (Dropdown) -->
+                <div class="mb-3">
+                    <label asp-for="Statut" class="form-label text-muted small fw-semibold">Statut</label>
+                    <select asp-for="Statut" class="form-select">
+                        <option value="1">Ouvert</option>
+                        <option value="0">Fermé</option>
+                        <option value="2">En travaux / Rénovation</option>
+                    </select>
+                </div>
+
+                <!-- Type (Dropdown) -->
+                <div class="mb-3">
+                    <label asp-for="TypeCategorie" class="form-label text-muted small fw-semibold">Type</label>
+                    <select asp-for="TypeCategorie" class="form-select" id="selectTypeCategorie">
+                        <option value="Place Publique">Place Publique</option>
+                        <option value="Monument">Monument</option>
+                        <option value="Musée">Musée</option>
+                        <option value="Jardin">Jardin</option>
+                        <option value="Restaurant">Restaurant</option>
+                        <option value="Café">Café</option>
+                        <option value="Hôtel">Hôtel / Hébergement</option>
+                        <option value="Shopping">Shopping / Souks</option>
+                        <option value="Hôpitale">Santé / Hôpital</option>
+                        <option value="Aéroport">Transport Public / Aéroport</option>
+                        <option value="Administration">Administration</option>
+                    </select>
+                </div>
+
+                <!-- Image Upload (Figure 14) -->
+                <div class="mb-3">
+                    <label asp-for="ImageFile" class="form-label text-muted small fw-semibold">Image</label>
+                    <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
+                    <small class="text-muted">Format PNG, JPG ou WebP</small>
+                </div>
+
+                <!-- Audio Upload (Figure 14) -->
+                <div class="mb-4">
+                    <label asp-for="AudioFile" class="form-label text-muted small fw-semibold">Audio (Guide vocal)</label>
+                    <input asp-for="AudioFile" type="file" class="form-control" accept="audio/*" />
+                    <small class="text-muted">Format MP3 ou WAV pour la lecture vocale mobile</small>
+                </div>
+
+                <!-- Boutons Annuler / Valider (Figure 14) -->
+                <div class="d-flex gap-2">
+                    <a asp-action="Index" class="btn" style="background-color: #0099cc; color: white; padding: 6px 20px;">
+                        Annuler
+                    </a>
+                    <button type="submit" class="btn" style="background-color: #0080aa; color: white; padding: 6px 24px; font-weight: 600;">
+                        Valider
+                    </button>
+                </div>
+            </div>
+
+            <!-- Colonne droite : Carte de positionnement interactif -->
+            <div class="col-lg-5">
+                <div class="card border-0 bg-light p-3 rounded-3 h-100">
+                    <h6 class="fw-bold text-dark mb-2">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>Positionner sur la carte
+                    </h6>
+                    <p class="text-muted small mb-2">
+                        Cliquez n'importe où sur la carte de Marrakech pour renseigner automatiquement la latitude et la longitude.
+                    </p>
+                    <div id="pickerMap" style="height: 380px; width: 100%; border-radius: 8px; border: 1px solid #cbd5e1;"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var defaultLat = 31.6258;
+            var defaultLng = -7.9891;
+
+            var map = L.map('pickerMap').setView([defaultLat, defaultLng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            var marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+
+            function updateInputs(lat, lng) {
+                document.getElementById('inputLatitude').value = lat.toFixed(6);
+                document.getElementById('inputLongitude').value = lng.toFixed(6);
+            }
+
+            map.on('click', function (e) {
+                marker.setLatLng(e.latlng);
+                updateInputs(e.latlng.lat, e.latlng.lng);
+            });
+
+            marker.on('dragend', function (e) {
+                var pos = marker.getLatLng();
+                updateInputs(pos.lat, pos.lng);
+            });
+        });
+    </script>
+}

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Tourism App Marrakech</title>
+    
+    <!-- Google Fonts & Bootstrap 5 & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        :root {
+            --primary-blue: #00a8cc;
+            --primary-hover: #008fae;
+            --topbar-bg: #00b4d8;
+            --sidebar-width: 210px;
+            --bg-light: #f4f6f9;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-light);
+            color: #334155;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header Navbar */
+        .top-navbar {
+            background: linear-gradient(90deg, #0099cc 0%, #00b4d8 100%);
+            height: 60px;
+            color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            z-index: 1030;
+        }
+
+        .search-input-group {
+            max-width: 380px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .search-input-group input {
+            background: transparent;
+            border: none;
+            color: white;
+            padding-left: 14px;
+        }
+
+        .search-input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .search-input-group input:focus {
+            box-shadow: none;
+            background: rgba(255, 255, 255, 0.28);
+            color: white;
+        }
+
+        .search-input-group .btn {
+            background: transparent;
+            border: none;
+            color: white;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+            background: #fff;
+        }
+
+        /* App Layout Container */
+        .app-body {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Sidebar Styling (faithful to Figure 13 / 16) */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #ffffff;
+            border-right: 1px solid #e2e8f0;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            gap: 12px;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            color: #0099cc;
+            background-color: #f0f9ff;
+            border-left: 4px solid #0099cc;
+            padding-left: 20px;
+            font-weight: 600;
+        }
+
+        .sidebar-menu li a i {
+            font-size: 1.15rem;
+        }
+
+        /* Main Content Container */
+        .main-content {
+            flex: 1;
+            padding: 28px 36px;
+            background-color: #f8fafc;
+            overflow-y: auto;
+        }
+
+        /* Card & Table Custom Styles */
+        .content-card {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            padding: 28px;
+        }
+
+        .btn-algo-primary {
+            background-color: #0099cc;
+            border-color: #0099cc;
+            color: white;
+            font-weight: 500;
+            padding: 8px 20px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-algo-primary:hover {
+            background-color: #0080aa;
+            border-color: #0080aa;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 153, 204, 0.3);
+        }
+
+        .btn-algo-secondary {
+            background-color: #64748b;
+            border-color: #64748b;
+            color: white;
+        }
+
+        .table-custom {
+            margin-top: 15px;
+        }
+
+        .table-custom th {
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.9rem;
+            background-color: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .table-custom td {
+            vertical-align: middle;
+            color: #334155;
+            font-size: 0.92rem;
+        }
+
+        .footer {
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            padding: 14px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <!-- Header Topbar (Figure 13) -->
+        <header class="top-navbar px-4 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <a href="@Url.Action("Index", "Endroits")" class="text-white text-decoration-none fw-bold fs-5 d-flex align-items-center gap-2">
+                    <i class="bi bi-geo-alt-fill text-warning"></i>
+                    <span>Tourism App Marrakech</span>
+                </a>
+            </div>
+
+            <!-- Global Search Bar -->
+            <form method="get" action="@Url.Action("Index", "Endroits")" class="d-flex my-auto">
+                <div class="input-group search-input-group">
+                    <input type="text" name="search" class="form-control form-control-sm" placeholder="Search for..." value="@ViewData["CurrentSearch"]" />
+                    <button class="btn btn-sm" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </form>
+
+            <!-- User Profile Dropdown -->
+            <div class="dropdown">
+                <a href="#" class="user-badge dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="user-avatar" />
+                    <span>@(User.Identity.Name ?? "Mohamed Dicko")</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    <li><h6 class="dropdown-header">Connecté en Administrateur</h6></li>
+                    <li><a class="dropdown-item" href="@Url.Action("Index", "Users")"><i class="bi bi-person me-2"></i>Mon Profil</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form method="post" action="@Url.Action("Logout", "Account")">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </header>
+
+        <!-- Body with Sidebar and Main Content -->
+        <div class="app-body">
+            <!-- Sidebar Navigation -->
+            <aside class="sidebar">
+                <ul class="sidebar-menu">
+                    <li>
+                        <a href="@Url.Action("Index", "Endroits")" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Endroits" ? "active" : "")">
+                            <i class="bi bi-geo"></i>
+                            <span>Site</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index", "Parcours")" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Parcours" ? "active" : "")">
+                            <i class="bi bi-signpost-split"></i>
+                            <span>Parcours</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index", "Evenements")" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Evenements" ? "active" : "")">
+                            <i class="bi bi-calendar-event"></i>
+                            <span>Événements</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index", "Users")" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Users" ? "active" : "")">
+                            <i class="bi bi-person"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/api/sync/all" target="_blank">
+                            <i class="bi bi-cloud-arrow-down"></i>
+                            <span>API Sync (Mobile)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Error404", "Home")" class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Error404" ? "active" : "")">
+                            <i class="bi bi-info-circle"></i>
+                            <span>Error404</span>
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @RenderBody()
+            </main>
+        </div>
+
+        <!-- Footer (Figure 13) -->
+        <footer class="footer">
+            <div class="container-fluid">
+                &copy; 2020 TOURISME APP by GROUPE ALGO CONSULTING
+            </div>
+        </footer>
+    }
+    else
+    {
+        <!-- Page publique / Login sans sidebar -->
+        <main class="flex-grow-1">
+            @RenderBody()
+        </main>
+    }
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

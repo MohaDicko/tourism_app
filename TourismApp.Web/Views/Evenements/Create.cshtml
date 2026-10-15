@@ -1,0 +1,61 @@
+@model TourismApp.Web.ViewModels.EvenementFormViewModel
+@{
+    ViewData["Title"] = "Créer un événement";
+}
+
+<div class="content-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <h4 class="fw-bold mb-0 text-dark">Planifier un Nouvel Événement</h4>
+        <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Retour
+        </a>
+    </div>
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label asp-for="Nom" class="form-label text-muted small fw-semibold">Nom de l'événement</label>
+            <input asp-for="Nom" class="form-control" placeholder="ex: Festival des Arts Populaires" required />
+            <span asp-validation-for="Nom" class="text-danger small"></span>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label asp-for="DateDebut" class="form-label text-muted small fw-semibold">Date de début</label>
+                <input asp-for="DateDebut" type="date" class="form-control" required />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="DateFin" class="form-label text-muted small fw-semibold">Date de fin</label>
+                <input asp-for="DateFin" type="date" class="form-control" required />
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label asp-for="EndroitId" class="form-label text-muted small fw-semibold">Lieu / Site associé</label>
+                <select asp-for="EndroitId" class="form-select" asp-items="ViewBag.EndroitList">
+                    <option value="">-- Aucun lieu spécifique / Marrakech global --</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Contacte" class="form-label text-muted small fw-semibold">Contact téléphonique</label>
+                <input asp-for="Contacte" class="form-control" placeholder="ex: +212 524 000000" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label text-muted small fw-semibold">Description</label>
+            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Détails de l'événement..."></textarea>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="ImageFile" class="form-label text-muted small fw-semibold">Affiche / Photo</label>
+            <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
+        </div>
+
+        <button type="submit" class="btn btn-algo-primary">
+            Enregistrer l'événement
+        </button>
+    </form>
+</div>

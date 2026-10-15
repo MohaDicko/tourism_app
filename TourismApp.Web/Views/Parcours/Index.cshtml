@@ -1,0 +1,65 @@
+@model IEnumerable<TourismApp.Web.Models.Parcours>
+@{
+    ViewData["Title"] = "Gestion des Parcours";
+}
+
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-1" style="color: #0f172a;">Gestion des Parcours & Itinéraires</h4>
+            <p class="text-muted small mb-0">Circuits touristiques recommandés avec étapes ordonnées</p>
+        </div>
+        <a asp-action="Create" class="btn btn-algo-primary d-inline-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg"></i>
+            <span>Nouveau Parcours</span>
+        </a>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var p in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border shadow-sm rounded-3 overflow-hidden">
+                    <div style="height: 180px; position: relative;">
+                        @if (!string.IsNullOrEmpty(p.ImageUrl))
+                        {
+                            <img src="@p.ImageUrl" class="w-100 h-100" style="object-fit: cover;" alt="@p.Nom" />
+                        }
+                        else
+                        {
+                            <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center text-muted">
+                                <i class="bi bi-signpost-2 fs-1"></i>
+                            </div>
+                        }
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-dark bg-opacity-75 px-2 py-1 small">
+                                <i class="bi bi-pin-map-fill text-warning me-1"></i>@p.Etapes.Count étapes
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="fw-bold text-dark mb-2">@p.Nom</h5>
+                        <p class="text-muted small flex-grow-1 line-clamp-2">
+                            @p.Description
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center text-secondary small pt-3 border-top mb-3">
+                            <span><i class="bi bi-clock me-1 text-primary"></i>@(p.Duree ?? "2h")</span>
+                            <span><i class="bi bi-rulers me-1 text-success"></i>@(p.Distance ?? "3 km")</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Details" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary flex-fill">
+                                Voir itinéraire
+                            </a>
+                            <form asp-action="Delete" asp-route-id="@p.Id" method="post" onsubmit="return confirm('Supprimer ce parcours ?');" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

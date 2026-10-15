@@ -1,0 +1,84 @@
+@model TourismApp.Web.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Connexion";
+    Layout = "_Layout";
+}
+
+<div class="d-flex align-items-center justify-content-center min-vh-100" style="background-color: #f1f5f9;">
+    <div class="card border-0 shadow-lg" style="width: 100%; max-width: 440px; border-radius: 16px; overflow: hidden;">
+        <div class="card-body p-4 p-md-5">
+            <div class="text-center mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-info-subtle text-info rounded-circle mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-geo-alt-fill fs-2 text-primary"></i>
+                </div>
+                <h3 class="fw-bold text-dark">Sign In With</h3>
+                <p class="text-muted small">Portail d'administration Tourism Marrakech</p>
+            </div>
+
+            <!-- Social Sign-in Buttons (Figure 12) -->
+            <div class="row g-2 mb-4">
+                <div class="col-6">
+                    <button type="button" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2 py-2" style="background-color: #3b5998; color: white; border: none; border-radius: 8px;">
+                        <i class="bi bi-facebook fs-6"></i>
+                        <span class="small fw-semibold">Facebook</span>
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button type="button" class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2 py-2" style="background-color: #ffffff; color: #444; border: 1px solid #cbd5e1; border-radius: 8px;">
+                        <i class="bi bi-google text-danger fs-6"></i>
+                        <span class="small fw-semibold">Google</span>
+                    </button>
+                </div>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger py-2 small" role="alert">
+                    <div asp-validation-summary="All" class="mb-0"></div>
+                </div>
+            }
+
+            <form method="post" asp-action="Login">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="ReturnUrl" />
+
+                <!-- Username -->
+                <div class="mb-3">
+                    <label asp-for="Username" class="form-label small text-muted fw-semibold">Username</label>
+                    <input asp-for="Username" class="form-control" placeholder="admin ou admin@tourismapp.ma" autofocus />
+                    <span asp-validation-for="Username" class="text-danger small"></span>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label asp-for="Password" class="form-label small text-muted fw-semibold mb-0">Password</label>
+                        <a href="javascript:alert('Mot de passe par défaut : admin123')" class="text-decoration-none small text-muted">Forgot?</a>
+                    </div>
+                    <input asp-for="Password" type="password" class="form-control mt-1" placeholder="admin123" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <!-- Remember Me -->
+                <div class="form-check mb-4">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label small text-muted">Se souvenir de moi</label>
+                </div>
+
+                <!-- Sign In Button (Figure 12) -->
+                <button type="submit" class="btn w-100 py-2 fw-semibold text-white mb-3" style="background-color: #263238; border-radius: 8px;">
+                    Sign In
+                </button>
+
+                <div class="text-center text-muted small">
+                    Not a member? <a href="javascript:alert('L\'enregistrement administrateur se fait via le SuperAdmin.')" class="text-decoration-none text-primary fw-semibold">Sign up now</a>
+                </div>
+
+                <div class="mt-4 p-2 bg-light rounded text-center small text-muted border">
+                    <i class="bi bi-info-circle me-1 text-info"></i>
+                    Identifiants démo : <strong>admin</strong> / <strong>admin123</strong>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

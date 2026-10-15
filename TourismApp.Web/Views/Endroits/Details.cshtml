@@ -1,0 +1,116 @@
+@model TourismApp.Web.Models.Endroit
+@{
+    ViewData["Title"] = Model.Nom;
+}
+
+<div class="content-card">
+    <!-- Header Buttons (Figure 15: Retour, Modifier) -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex gap-2">
+            <a asp-action="Index" class="btn" style="background-color: #0099cc; color: white; padding: 6px 18px; font-weight: 500;">
+                Retour
+            </a>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn" style="background-color: #0080aa; color: white; padding: 6px 18px; font-weight: 500;">
+                Modifier
+            </a>
+        </div>
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Supprimer ce site ?');" class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash me-1"></i>Supprimer le site
+            </button>
+        </form>
+    </div>
+
+    <!-- Layout Figure 15 : Image à gauche + Carte à droite -->
+    <div class="row g-4 mb-4">
+        <!-- Image du site -->
+        <div class="col-md-5">
+            <div class="border rounded-3 overflow-hidden shadow-sm h-100" style="max-height: 380px;">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" alt="@Model.Nom" class="w-100 h-100" style="object-fit: cover;" />
+                }
+                else
+                {
+                    <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-light text-muted p-5">
+                        <i class="bi bi-image fs-1 mb-2"></i>
+                        <span>Aucune image disponible</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Carte géographique interactive Leaflet (Figure 15) -->
+        <div class="col-md-7">
+            <div class="border rounded-3 overflow-hidden shadow-sm position-relative">
+                <div id="siteMap" style="height: 380px; width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Description (Figure 15) -->
+    <div class="mb-4">
+        <h5 class="fw-bold text-dark mb-2">Description</h5>
+        <p class="text-secondary leading-relaxed" style="font-size: 0.95rem; line-height: 1.7;">
+            @(string.IsNullOrWhiteSpace(Model.Description) ? "Aucune description fournie pour ce lieu." : Model.Description)
+        </p>
+    </div>
+
+    <!-- Section Métadonnées et Audio-Guide -->
+    <div class="row g-3 p-3 bg-light rounded-3 border">
+        <div class="col-md-3">
+            <small class="text-muted d-block fw-semibold">Type de site</small>
+            <span class="badge bg-info text-white mt-1 px-3 py-2">@Model.TypeCategorie</span>
+        </div>
+        <div class="col-md-3">
+            <small class="text-muted d-block fw-semibold">Statut actuel</small>
+            <span class="badge @(Model.Statut == TourismApp.Web.Models.EndroitStatut.Ouvert ? "bg-success" : "bg-warning text-dark") mt-1 px-3 py-2">
+                @Model.Statut.ToString()
+            </span>
+        </div>
+        <div class="col-md-3">
+            <small class="text-muted d-block fw-semibold">Contact GSM</small>
+            <div class="mt-1 fw-semibold text-dark">
+                @(string.IsNullOrEmpty(Model.Numero) ? "Non renseigné" : Model.Numero)
+            </div>
+        </div>
+        <div class="col-md-3">
+            <small class="text-muted d-block fw-semibold">Coordonnées GPS</small>
+            <div class="mt-1 small text-dark">
+                @Model.Latitude.ToString("F5"), @Model.Longitude.ToString("F5")
+            </div>
+        </div>
+
+        <!-- Lecteur Audio-Guide si présent -->
+        @if (!string.IsNullOrEmpty(Model.AudioUrl))
+        {
+            <div class="col-12 mt-3 pt-3 border-top">
+                <label class="fw-bold small text-dark d-block mb-1">
+                    <i class="bi bi-volume-up-fill text-primary me-1"></i>Guide vocal (Audio-Guide)
+                </label>
+                <audio controls class="w-100">
+                    <source src="@Model.AudioUrl" type="audio/mpeg">
+                    Votre navigateur ne supporte pas le lecteur audio.
+                </audio>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var lat = @Model.Latitude;
+            var lng = @Model.Longitude;
+
+            var map = L.map('siteMap').setView([lat, lng], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            var popupContent = '<strong>@Model.Nom</strong><br/><span class="badge bg-primary">@Model.TypeCategorie</span>';
+            L.marker([lat, lng]).addTo(map).bindPopup(popupContent).openPopup();
+        });
+    </script>
+}
