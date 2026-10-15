@@ -155,13 +155,18 @@ const FALLBACK_DATA = {
 
 export const apiService = {
   // Synchronisation avec le backend ASP.NET Core MVC (/api/sync/all)
-  async syncAll(apiBase = DEFAULT_API_BASE) {
+    let customUrl = null;
+    try {
+      customUrl = await AsyncStorage.getItem("TOURISME_CUSTOM_API_URL");
+    } catch {}
+
     const candidates = [
+      customUrl,
       apiBase,
       "http://localhost:5240",
       "http://10.0.2.2:5240",
       "http://172.20.10.2:5240"
-    ];
+    ].filter(Boolean);
 
     // Supprimer les doublons
     const uniqueCandidates = [...new Set(candidates)];

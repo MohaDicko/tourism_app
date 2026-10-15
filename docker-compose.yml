@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # 1. Service Base de Données Microsoft SQL Server 2022
+  tourism-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: tourism_sqlserver
+    restart: always
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=TourismPass2026!
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    networks:
+      - tourism_network
+
+  # 2. Service Backend ASP.NET Core MVC & API REST
+  tourism-backend:
+    build:
+      context: ./TourismApp.Web
+      dockerfile: Dockerfile
+    container_name: tourism_backend
+    restart: always
+    depends_on:
+      - tourism-db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - UseSqlServer=true
+      - ConnectionStrings__SqlServerConnection=Server=tourism-db,1433;Database=TourismAppDb;User Id=sa;Password=TourismPass2026!;TrustServerCertificate=True;MultipleActiveResultSets=true
+    ports:
+      - "5240:8080"
+    volumes:
+      - ./uploads:/app/wwwroot/uploads
+    networks:
+      - tourism_network
+
+volumes:
+  mssql_data:
+    driver: local
+
+networks:
+  tourism_network:
+    driver: bridge
